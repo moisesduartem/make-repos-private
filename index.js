@@ -11,26 +11,36 @@ const githubApi = axios.create({
     }
 })
 
-function handleError(reason) {
-    console.error(reason.message)
-}
-
-function changeRepoToPrivate(repoName) {
-    githubApi.patch(`/repos/${githubUser}/${repoName}`, {
+async function changeRepoToPrivate(repoName) {
+    const body = {
         private: true,
-    })
-    .then(response => response.data)
-    .catch(handleError);
+    };
+
+    await githubApi.patch(`/repos/${githubUser}/${repoName}`, body);
 }
 
-function getAllRepos(data) {
-    const repos = data.map(x => x.name);
-    repos.forEach((value, index) => {
-        changeRepoToPrivate(value);
-    });
+async function getAllRepos() {
+    console.log(`Getting ${githubUser}'s repositories`)
+    const { data } = await githubApi.get(`/users/${githubUser}/repos?type=owner`);
+
+    console.log(`Returning repositories`)
+    return data.map(x => x.name);
 }
 
-githubApi
-.get(`/users/${githubUser}/repos?type=owner`)
-.then(response => getAllRepos(response.data))
-.catch(handleError);
+async function main() {
+    try {
+        const repos = await getAllRepos();
+
+        console.log(`Requesting visbility change for each ${githubUser}'s public repository`)
+        for (const name of repos) {
+            changeRepoToPrivate(name);
+        }
+
+        console.log('Finish! Changed repo\'s: ', repos)
+    } catch (err) {
+        console.error('Failed to process');
+        console.error(err.message);
+    }
+}
+
+main();
