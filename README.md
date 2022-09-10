@@ -8,7 +8,7 @@ At first, you need to download the repository locally using `git clone`
 git clone https://github.com/moisesduartem/make-repos-private -b main
 ```
 
-To execute the requests easily, this project depends on `[axios](https://axios-http.com/docs/intro)`.
+To execute the requests easily, this project depends on `axios`.
 
 So, installing the `package.json` dependencies it’s required with the following command
 
